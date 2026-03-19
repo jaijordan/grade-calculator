@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-primary: #070809;
+  --color-card: #121416;
+  --color-card-2: #191b1e;
+  --color-border: rgba(255,255,255,0.10);
+  --color-border-light: rgba(255,255,255,0.12);
+  --color-text-muted: #7a7e86;
+  --color-text-dim: #494d56;
+
+  --color-accent-blue: #38BDF8;
+  --color-accent-blue-light: #7DD3FC;
+  --color-accent-blue-dark: #0EA5E9;
+  --color-accent-green: #2dd4a8;
+  --color-accent-pink: #FF595E;
+  --color-accent-purple: #8b5cf6;
+  --color-accent-orange: #f97316;
+  --color-accent-yellow: #eab308;
+  --color-accent-teal: #06b6d4;
+
+  /* Grade tier colors */
+  --color-grade-a: #2dd4a8;
+  --color-grade-b: #38BDF8;
+  --color-grade-c: #eab308;
+  --color-grade-d: #f97316;
+  --color-grade-f: #FF595E;
+
+  /* Fonts */
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Border radii */
+  --radius-card: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #070809;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom range slider styles */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  cursor: pointer;
+  margin-top: -4px;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
+  transition: box-shadow 0.15s ease, background 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.18);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
+}
+
+/* Setup page hover utilities */
+.setup-back-btn { color: #494d56; transition: color 0.15s; }
+.setup-back-btn:hover { color: #7a7e86; }
+
+.setup-add-category-btn { color: #7a7e86; border-color: rgba(255,255,255,0.10); transition: color 0.15s, border-color 0.15s; }
+.setup-add-category-btn:hover { color: #ffffff; border-color: rgba(255,255,255,0.22); }
+
+.setup-color-dot { transition: transform 0.12s; }
+.setup-color-dot:hover { transform: scale(1.3); }
+
+.setup-remove-btn { color: #494d56; transition: color 0.15s; }
+.setup-remove-btn:hover { color: #f43f5e; }
+
+/* Card border glow — applied to dark cards (OverflowCategoryCard, LetterScale) */
+.card-hoverable {
+  transition: box-shadow 0.25s ease;
+}
+.card-hoverable:hover {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0D1829;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.15);
+}
