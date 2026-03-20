@@ -11,6 +11,7 @@ import CategoryCard from './CategoryCard'
 import OverflowCategoryCard from './OverflowCategoryCard'
 import LetterScale from './LetterScale'
 import DemoPrompt from './DemoPrompt'
+import DemoBanner from './DemoBanner'
 import { C, FONT_SANS, FONT_MONO } from './tokens'
 
 // ─── Demo data (never persisted) ─────────────────────────────────────────────
@@ -75,6 +76,8 @@ export default function Calculator() {
   const [promptDismissed, setPromptDismissed] = useState(
     () => sessionStorage.getItem('demoDismissed') === '1'
   )
+  const [bannerReady, setBannerReady] = useState(false)
+  const [showBanner,  setShowBanner]  = useState(false)
   const timerRef = useRef(null)
 
   useEffect(() => {
@@ -84,7 +87,7 @@ export default function Calculator() {
   }, [isDemo, promptDismissed])
 
   useEffect(() => {
-    if (isDemo) { setShowPrompt(false); setPromptDismissed(false); sessionStorage.removeItem('demoDismissed') }
+    if (isDemo) { setShowPrompt(false); setPromptDismissed(false); setBannerReady(false); setShowBanner(false); sessionStorage.removeItem('demoDismissed') }
   }, [isDemo])
 
   // Reset demo course to initial data whenever demo mode is entered
@@ -93,6 +96,8 @@ export default function Calculator() {
   // ── Item detail modal ────────────────────────────────────────────────────────
   const [openCatId, setOpenCatId] = useState(null)
   const openCategory = course?.categories.find((c) => c.id === openCatId) ?? null
+
+  const [addCourseHovered, setAddCourseHovered] = useState(false)
 
   // ── Course switcher ──────────────────────────────────────────────────────────
   const [switcherOpen, setSwitcherOpen] = useState(false)
@@ -128,9 +133,14 @@ export default function Calculator() {
     }
   }, [])
 
+  function triggerBanner() {
+    if (bannerReady) { setShowBanner(true); setBannerReady(false) }
+  }
+
   function handlePreviewChange(catId, val) {
     clearTimeout(previewTimers.current[catId])
     setPreviewGrades((prev) => ({ ...prev, [catId]: val }))
+    triggerBanner()
   }
 
   function handlePreviewEnd(catId) {
@@ -161,6 +171,7 @@ export default function Calculator() {
 
   // ── Demo mutations (local state only, never persisted to Zustand) ────────────
   function demoSetItemGrade(_cid, catId, itemId, grade) {
+    triggerBanner()
     setDemoCourse((prev) => ({
       ...prev,
       categories: prev.categories.map((cat) =>
@@ -172,6 +183,7 @@ export default function Calculator() {
   }
 
   function demoToggleItem(_cid, catId, itemId) {
+    triggerBanner()
     setDemoCourse((prev) => ({
       ...prev,
       categories: prev.categories.map((cat) =>
@@ -223,7 +235,7 @@ export default function Calculator() {
     courseId,
   }
 
-  const openModal = (id) => setOpenCatId(id)
+  function openModal(id) { triggerBanner(); setOpenCatId(id) }
 
   function handleDeleteCourse(id) {
     deleteCourse(id)
@@ -232,11 +244,6 @@ export default function Calculator() {
   // ── Shared header content ────────────────────────────────────────────────────
   const HeaderLeft = (
     <div>
-      {isDemo && (
-        <div style={{ color: C.dim, fontFamily: FONT_SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', marginBottom: 6 }}>
-          DEMO MODE
-        </div>
-      )}
       <div style={{ color: C.white, fontWeight: 900, fontSize: 'clamp(22px, 3.5vw, 44px)', lineHeight: 0.88, letterSpacing: '-0.02em', fontFamily: FONT_SANS }}>GRADE</div>
       <div style={{ color: C.blue,  fontWeight: 900, fontSize: 'clamp(22px, 3.5vw, 44px)', lineHeight: 0.88, letterSpacing: '-0.02em', fontFamily: FONT_SANS }}>CALCULATOR</div>
     </div>
@@ -264,18 +271,34 @@ export default function Calculator() {
       {course.semester    && <span style={{ color: C.dim,   fontFamily: FONT_SANS, fontSize: 11 }}>{course.semester}</span>}
     </div>
   ) : (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3, paddingBottom: 2 }}>
-      <span style={{ color: C.white, fontFamily: FONT_SANS, fontWeight: 900, fontSize: 13, letterSpacing: '0.06em' }}>{course.name}</span>
-      {course.institution && <span style={{ color: C.muted, fontFamily: FONT_SANS, fontSize: 11 }}>{course.institution}</span>}
-      {course.semester    && <span style={{ color: C.dim,   fontFamily: FONT_SANS, fontSize: 11 }}>{course.semester}</span>}
-      <motion.button
-        {...buttonHover}
-        onClick={() => navigate('/course/new/setup')}
-        style={{ marginTop: 4, padding: '5px 12px', backgroundColor: C.blue, border: 'none', borderRadius: 8, color: '#000', fontFamily: FONT_SANS, fontSize: 10, fontWeight: 900, letterSpacing: '0.1em', cursor: 'pointer' }}
+    <motion.button
+      onClick={() => navigate('/course/new/setup')}
+      onMouseEnter={() => setAddCourseHovered(true)}
+      onMouseLeave={() => setAddCourseHovered(false)}
+      animate={{
+        backgroundColor: addCourseHovered ? C.card : '#ffffff',
+        borderColor: addCourseHovered ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0)',
+      }}
+      whileTap={{ scale: 0.97, transition: { duration: 0.08 } }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      style={{
+        alignSelf: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 14px',
+        border: '1px solid rgba(255,255,255,0)',
+        borderRadius: 8,
+        cursor: 'pointer',
+      }}
+    >
+      <motion.span
+        animate={{ color: addCourseHovered ? '#ffffff' : C.bg }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        style={{ fontFamily: FONT_SANS, fontWeight: 700, fontSize: 12, letterSpacing: '0.06em' }}
       >
-        GET STARTED
-      </motion.button>
-    </div>
+        Add Course
+      </motion.span>
+    </motion.button>
   )
 
   return (
@@ -421,7 +444,7 @@ export default function Calculator() {
       <AnimatePresence>
         {isDemo && showPrompt && !promptDismissed && (
           <DemoPrompt
-            onDismiss={() => { setShowPrompt(false); setPromptDismissed(true); sessionStorage.setItem('demoDismissed', '1') }}
+            onDismiss={() => { setShowPrompt(false); setPromptDismissed(true); setBannerReady(true); sessionStorage.setItem('demoDismissed', '1') }}
             onGetStarted={() => navigate('/course/new/setup')}
           />
         )}
@@ -437,6 +460,11 @@ export default function Calculator() {
             handlers={isDemo ? demoHandlers : null}
           />
         )}
+      </AnimatePresence>
+
+      {/* ── Demo banner ──────────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {isDemo && showBanner && <DemoBanner />}
       </AnimatePresence>
     </div>
   )
