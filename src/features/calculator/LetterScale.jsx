@@ -53,30 +53,27 @@ export default function LetterScale({ scale, currentGrade, categories = [], comp
         {/* Header with tab switcher */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexShrink: 0 }}>
           <div style={{ display: 'flex', gap: 2 }}>
-            {['scale', 'required'].map((v) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: FONT_SANS,
-                  fontWeight: 900,
-                  fontSize: 11,
-                  letterSpacing: '0.14em',
-                  color: view === v ? C.white : C.dim,
-                  padding: '0 6px 0 0',
-                  transition: 'color 0.15s',
-                }}
-              >
-                {v === 'scale' ? 'SCALE' : 'REQUIRED'}
-              </button>
-            ))}
+            <button
+              onClick={() => setView('scale')}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: FONT_SANS,
+                fontWeight: 900,
+                fontSize: 11,
+                letterSpacing: '0.14em',
+                color: C.white,
+                padding: '0 6px 0 0',
+                transition: 'color 0.15s',
+              }}
+            >
+              SCALE
+            </button>
           </div>
         </div>
 
-        {/* ── Scale view ── */}
+        {/* Scale view */}
         {view === 'scale' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 20, rowGap: 0, flex: compact ? undefined : 1, overflow: compact ? undefined : 'hidden' }}>
             {[left, right].map((col, ci) => (
@@ -122,7 +119,7 @@ export default function LetterScale({ scale, currentGrade, categories = [], comp
           </div>
         )}
 
-        {/* ── Required view ── */}
+        {/* "REQUIRED" view hidden, pending redesign */}
         {view === 'required' && (
           <div style={{ display: 'flex', flexDirection: 'column', flex: compact ? undefined : 1, minHeight: 0, gap: 6 }}>
             {/* Target grade chips */}
