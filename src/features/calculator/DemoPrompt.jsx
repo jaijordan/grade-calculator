@@ -2,9 +2,6 @@ import { motion } from 'framer-motion'
 import { buttonHover } from '../../utils/hoverPresets'
 import { C, FONT_SANS, FONT_MONO } from './tokens'
 
-// ─── Demo Prompt ──────────────────────────────────────────────────────────────
-// Centered modal that appears ~800ms after landing on the demo page.
-// Encourages new users to add their own course. Dismissed per-session.
 export default function DemoPrompt({ onDismiss, onGetStarted }) {
   return (
     <motion.div
@@ -68,12 +65,10 @@ export default function DemoPrompt({ onDismiss, onGetStarted }) {
             <span style={{ fontFamily: FONT_MONO, fontWeight: 900, fontSize: 18, color: C.blue }}>A+</span>
           </div>
 
-          {/* Title */}
           <div style={{ color: C.white, fontFamily: FONT_SANS, fontWeight: 900, fontSize: 20, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
             Stay On Track
           </div>
 
-          {/* Subtitle */}
           <div style={{ color: C.muted, fontFamily: FONT_SANS, fontSize: 13, lineHeight: 1.5, maxWidth: 300 }}>
             Wondering what you need on the final to save your grade? Add your course to find out.
           </div>

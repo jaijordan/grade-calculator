@@ -67,7 +67,10 @@ export default function Calculator() {
   } = useCourseStore()
 
   const isDemo  = Object.keys(courses).length === 0
-  const [demoCourse, setDemoCourse] = useState(() => DEMO_COURSE)
+  const [demoCourse, setDemoCourse] = useState(() => {
+    const saved = sessionStorage.getItem('demoCourse')
+    return saved ? JSON.parse(saved) : DEMO_COURSE
+  })
   const courseId = isDemo ? '__demo__' : (activeCourseId ?? Object.keys(courses)[0])
   const course   = isDemo ? demoCourse : (courses[activeCourseId] ?? Object.values(courses)[0])
 
@@ -87,11 +90,26 @@ export default function Calculator() {
   }, [isDemo, promptDismissed])
 
   useEffect(() => {
-    if (isDemo) { setShowPrompt(false); setPromptDismissed(false); setBannerReady(false); setShowBanner(false); sessionStorage.removeItem('demoDismissed') }
-  }, [isDemo])
+    if (showPrompt) sessionStorage.setItem('demoDismissed', '1')
+  }, [showPrompt])
 
-  // Reset demo course to initial data whenever demo mode is entered
-  useEffect(() => { if (isDemo) setDemoCourse(DEMO_COURSE) }, [isDemo])
+  useEffect(() => {
+    if (isDemo) sessionStorage.setItem('demoCourse', JSON.stringify(demoCourse))
+  }, [demoCourse, isDemo])
+
+  const prevIsDemoRef = useRef(null)
+  useEffect(() => {
+    if (prevIsDemoRef.current === false && isDemo) {
+      setShowPrompt(false)
+      setPromptDismissed(false)
+      setBannerReady(false)
+      setShowBanner(false)
+      sessionStorage.removeItem('demoDismissed')
+      sessionStorage.removeItem('demoCourse')
+      setDemoCourse(DEMO_COURSE)
+    }
+    prevIsDemoRef.current = isDemo
+  }, [isDemo])
 
   // ── Item detail modal ────────────────────────────────────────────────────────
   const [openCatId, setOpenCatId] = useState(null)
@@ -444,7 +462,7 @@ export default function Calculator() {
       <AnimatePresence>
         {isDemo && showPrompt && !promptDismissed && (
           <DemoPrompt
-            onDismiss={() => { setShowPrompt(false); setPromptDismissed(true); setBannerReady(true); sessionStorage.setItem('demoDismissed', '1') }}
+            onDismiss={() => { setShowPrompt(false); setPromptDismissed(true); setBannerReady(true) }}
             onGetStarted={() => navigate('/course/new/setup')}
           />
         )}

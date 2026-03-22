@@ -32,7 +32,7 @@ export default function DemoBanner() {
         }}
       >
         <span style={{ color: C.white, fontFamily: FONT_SANS, fontWeight: 700, fontSize: 12, letterSpacing: '0.06em' }}>
-          Save this breakdown
+          Save Your Grade
         </span>
         <span style={{ color: C.blue, fontSize: 13 }}>→</span>
       </motion.button>

@@ -1,5 +1,5 @@
 // ─── Design tokens ────────────────────────────────────────────────────────────
-// Single source of truth for all calculator-feature design constants.
+// 
 
 export const C = {
   bg:     '#070809',
