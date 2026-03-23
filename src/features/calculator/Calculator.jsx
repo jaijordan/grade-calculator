@@ -294,8 +294,8 @@ export default function Calculator() {
       onMouseEnter={() => setAddCourseHovered(true)}
       onMouseLeave={() => setAddCourseHovered(false)}
       animate={{
-        backgroundColor: addCourseHovered ? C.card : '#ffffff',
-        borderColor: addCourseHovered ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0)',
+        backgroundColor: addCourseHovered ? C.card2 : C.card,
+        borderColor: addCourseHovered ? 'rgba(255,255,255,0.22)' : C.border,
       }}
       whileTap={{ scale: 0.97, transition: { duration: 0.08 } }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
@@ -304,13 +304,13 @@ export default function Calculator() {
         display: 'flex',
         alignItems: 'center',
         padding: '8px 14px',
-        border: '1px solid rgba(255,255,255,0)',
+        border: `1px solid ${C.border}`,
         borderRadius: 8,
         cursor: 'pointer',
       }}
     >
       <motion.span
-        animate={{ color: addCourseHovered ? '#ffffff' : C.bg }}
+        animate={{ color: C.white }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
         style={{ fontFamily: FONT_SANS, fontWeight: 700, fontSize: 12, letterSpacing: '0.06em' }}
       >
