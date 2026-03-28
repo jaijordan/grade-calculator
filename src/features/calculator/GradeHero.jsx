@@ -135,23 +135,22 @@ export default function GradeHero({ letter, grade, compact = false }) {
           boxSizing: 'border-box',
           padding: '16px 20px',
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: 'column',
           justifyContent: 'space-between',
+          minHeight: 140,
         }}
       >
         {AnimatedBackground}
-        <div style={{ position: 'relative', zIndex: 10 }}>
-          <p style={{ color: 'rgba(255,255,255,0.6)', fontFamily: FONT_SANS, fontWeight: 900, fontSize: 9, letterSpacing: '0.16em', margin: '0 0 4px' }}>
-            PROJECTED GRADE
-          </p>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ color: '#fff', fontFamily: FONT_MONO, fontWeight: 900, fontSize: 52, lineHeight: 1, letterSpacing: '-0.02em' }}>
-              {letter}
-            </span>
-            <span style={{ color: 'rgba(255,255,255,0.85)', fontFamily: FONT_MONO, fontWeight: 700, fontSize: 22 }}>
-              {grade}%
-            </span>
-          </div>
+        <p style={{ position: 'relative', zIndex: 10, color: 'rgba(255,255,255,0.6)', fontFamily: FONT_SANS, fontWeight: 900, fontSize: 9, letterSpacing: '0.16em', margin: 0 }}>
+          PROJECTED GRADE
+        </p>
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <span style={{ color: '#fff', fontFamily: FONT_MONO, fontWeight: 900, fontSize: 52, lineHeight: 1, letterSpacing: '-0.02em' }}>
+            {letter}
+          </span>
+          <span style={{ color: 'rgba(255,255,255,0.85)', fontFamily: FONT_MONO, fontWeight: 700, fontSize: 22 }}>
+            {grade}%
+          </span>
         </div>
       </div>
     )
@@ -184,7 +183,7 @@ export default function GradeHero({ letter, grade, compact = false }) {
         </p>
       </div>
       <div style={{ position: 'relative', zIndex: 10 }}>
-        <div style={{ color: '#ffffff', fontFamily: FONT_MONO, fontWeight: 900, fontSize: 'clamp(56px, 7vw, 96px)', lineHeight: 1, letterSpacing: '-0.02em' }}>
+        <div style={{ color: '#ffffff', fontFamily: FONT_MONO, fontWeight: 900, fontSize: 'clamp(56px, 7vw, 96px)', lineHeight: 1, letterSpacing: '-0.02em', marginLeft: '-0.05em' }}>
           {letter}
         </div>
         <div style={{ color: 'rgba(255,255,255,0.9)', fontFamily: FONT_MONO, fontWeight: 700, fontSize: 22, marginTop: 6 }}>
