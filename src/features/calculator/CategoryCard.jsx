@@ -192,6 +192,7 @@ export default function CategoryCard({
           {sliderWrapper}
         </div>
 
+        {/* Consider adding this later. At the moment, this is omitted due to space constraints.
         {wide && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexShrink: 0, marginBottom: 8 }}>
             {['0% – FAIL', '50% – MID', '100% – PERFECT'].map((label) => (
@@ -199,6 +200,7 @@ export default function CategoryCard({
             ))}
           </div>
         )}
+        */}
 
         <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, marginTop: wide ? 0 : 4 }}>
           {category.items.map((item) => (
