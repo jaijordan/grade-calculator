@@ -335,57 +335,58 @@ export default function Calculator() {
 
       {/* ════════════════════════════════════════════════════════════════════════
           MOBILE LAYOUT  (hidden on md+)
-          Single-column, scrollable, card-based
+          Full-width cards, one per row, dvh-based heights, scrollable.
+          Each card fills ~75–80% of the viewport so the next card peeks
+          below, signalling scrollability to the user.
       ════════════════════════════════════════════════════════════════════════ */}
-      <div className="flex flex-col gap-3 pb-6 md:hidden" style={{ padding: '0 16px 80px' }}>
+      <div className="flex flex-col gap-4 md:hidden" style={{ padding: '0 20px 60px' }}>
 
-        {/* Compact grade hero */}
-        <GradeHero letter={letter} grade={rounded} compact />
+        {/* Grade hero — 60dvh, shorter than category cards as the entry point */}
+        <div style={{ height: '60dvh' }}>
+          <GradeHero letter={letter} grade={rounded} />
+        </div>
 
-        {/* Category tiles — 2-column grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {course.categories.map((cat) => (
+        {/* Category cards — 75dvh each, mobile hero variant */}
+        {course.categories.map((cat) => (
+          <div key={cat.id} style={{ height: '75dvh' }}>
             <CategoryCard
-              key={cat.id}
+              mobile
               category={cat}
               {...actions}
               onClick={() => openModal(cat.id)}
               previewValue={previewGrades[cat.id]}
               onPreviewChange={(val) => handlePreviewChange(cat.id, val)}
               onPreviewEnd={() => handlePreviewEnd(cat.id)}
-              compact
             />
-          ))}
-          {/* Add Category tile — fills gap when odd, spans full width when even */}
-          {!isDemo && (() => {
-            const isEven = course.categories.length % 2 === 0
-            return (
-              <motion.button
-                onClick={() => navigate(`/course/${courseId}/setup?addCategory=1`)}
-                whileHover={{ borderColor: 'rgba(255,255,255,0.22)', backgroundColor: 'rgba(255,255,255,0.03)' }}
-                transition={{ duration: 0.15 }}
-                className={isEven ? 'col-span-2' : ''}
-                style={{
-                  background: 'transparent',
-                  border: `1px dashed ${C.border}`,
-                  borderRadius: 14,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 4,
-                  cursor: 'pointer',
-                  padding: isEven ? '14px 0' : undefined,
-                }}
-              >
-                <span style={{ color: C.dim, fontSize: 20, lineHeight: 1, fontWeight: 300 }}>+</span>
-                <span style={{ color: C.dim, fontFamily: FONT_SANS, fontWeight: 700, fontSize: 9, letterSpacing: '0.12em' }}>ADD CATEGORY</span>
-              </motion.button>
-            )
-          })()}
-        </div>
+          </div>
+        ))}
 
-        {/* Letter scale */}
+        {/* Add Category — fixed height action button, not a data card */}
+        {!isDemo && (
+          <motion.button
+            onClick={() => navigate(`/course/${courseId}/setup?addCategory=1`)}
+            whileHover={{ borderColor: 'rgba(255,255,255,0.22)', backgroundColor: 'rgba(255,255,255,0.03)' }}
+            transition={{ duration: 0.15 }}
+            style={{
+              height: 100,
+              width: '100%',
+              background: 'transparent',
+              border: `1px dashed ${C.border}`,
+              borderRadius: 14,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+              cursor: 'pointer',
+            }}
+          >
+            <span style={{ color: C.dim, fontSize: 20, lineHeight: 1, fontWeight: 300 }}>+</span>
+            <span style={{ color: C.dim, fontFamily: FONT_SANS, fontWeight: 700, fontSize: 9, letterSpacing: '0.12em' }}>ADD CATEGORY</span>
+          </motion.button>
+        )}
+
+        {/* Letter scale — auto height, terminal card, no peek needed */}
         <LetterScale scale={course.scale} currentGrade={rounded} categories={course.categories} compact />
       </div>
 

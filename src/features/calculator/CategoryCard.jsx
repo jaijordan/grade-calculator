@@ -6,11 +6,12 @@ import Slider from '../../components/Slider'
 import { C, CARD_BG, FONT_SANS, FONT_MONO } from './tokens'
 
 // ─── Category Card ────────────────────────────────────────────────────────────
+// mobile=true  → full-width hero card for mobile scroll layout (no item list)
 // compact=true → tile for mobile 2-col grid (no item list)
 // compact=false (default) → full card for desktop grid cell
 export default function CategoryCard({
   category, courseId, setItemGrade, toggleItem,
-  wide = false, onClick, compact = false,
+  wide = false, onClick, compact = false, mobile = false,
   previewValue, onPreviewChange, onPreviewEnd,
 }) {
   const { spotX, spotY, handleMouseMove, handleMouseLeave } = useCardSpotlight()
@@ -64,7 +65,7 @@ export default function CategoryCard({
       onMouseUp={() => { setIsDragging(false); commitSingle(); onPreviewEnd?.() }}
       onTouchEnd={() => { setIsDragging(false); commitSingle(); onPreviewEnd?.() }}
     >
-      {!singleItem && !compact && (
+      {!singleItem && !compact && !mobile && (
         <p style={{
           position: 'absolute',
           bottom: 'calc(100% + 5px)',
@@ -89,6 +90,61 @@ export default function CategoryCard({
       />
     </div>
   )
+
+  if (mobile) {
+    return (
+      <motion.div
+        onClick={onClick}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        whileTap={onClick ? { scale: 0.985 } : undefined}
+        transition={{ duration: 0.1 }}
+        style={{
+          position: 'relative',
+          height: '100%',
+          overflow: 'hidden',
+          borderRadius: 14,
+          background: CARD_BG,
+          border: `1px solid ${isPreviewing ? C.blue + '60' : C.border}`,
+          boxSizing: 'border-box',
+          cursor: onClick ? 'pointer' : 'default',
+          transition: 'border-color 0.15s',
+        }}
+      >
+        <CardSpotlight spotX={spotX} spotY={spotY} color="rgba(255,255,255,0.06)" />
+        <div style={{
+          position: 'relative', zIndex: 1, height: '100%',
+          padding: '20px 22px 24px',
+          display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+          boxSizing: 'border-box',
+        }}>
+          {/* Top: name + weight */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+            <p style={{ color: C.white, fontFamily: FONT_SANS, fontWeight: 900, fontSize: 14, letterSpacing: '0.1em', margin: 0 }}>
+              {category.name.toUpperCase()}
+            </p>
+            <WeightBadge weight={category.weight} accent={accent} />
+          </div>
+
+          {/* Centre: grade number */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            <span style={{ color: displayColor, fontFamily: FONT_MONO, fontWeight: 900, fontSize: 'clamp(72px, 20vw, 96px)', lineHeight: 1, letterSpacing: '-0.02em', marginLeft: '-0.03em' }}>
+              {displayNum}
+            </span>
+            <span style={{ color: C.muted, fontFamily: FONT_MONO, fontWeight: 700, fontSize: 22, paddingBottom: 6 }}>%</span>
+          </div>
+
+          {/* Bottom: slider + item count */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {sliderWrapper}
+            <p style={{ color: C.muted, fontFamily: FONT_SANS, fontSize: 11, margin: 0, letterSpacing: '0.04em' }}>
+              {activeCount} {activeCount === 1 ? 'item' : 'items'} · tap to view
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
 
   if (compact) {
     return (
