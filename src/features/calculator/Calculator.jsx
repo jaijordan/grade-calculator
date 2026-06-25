@@ -120,9 +120,38 @@ export default function Calculator() {
   // ── Course switcher ──────────────────────────────────────────────────────────
   const [switcherOpen, setSwitcherOpen] = useState(false)
 
-  // ── Overflow category navigation ─────────────────────────────────────────────
+  // ── Overflow category navigation + mobile carousel ───────────────────────────
   const [overflowIdx, setOverflowIdx] = useState(0)
-  useEffect(() => { setOverflowIdx(0) }, [courseId])
+  const [activeSlide, setActiveSlide] = useState(0)
+  const trackRef  = useRef(null)
+  const scrollRAF = useRef(null)
+  // Reset navigation state whenever the active course changes
+  useEffect(() => {
+    setOverflowIdx(0)
+    setActiveSlide(0)
+    if (trackRef.current) trackRef.current.scrollLeft = 0
+  }, [courseId])
+
+  function slideStep(el) {
+    const first = el.children[0]
+    return first ? first.offsetWidth + 12 : el.clientWidth  // card width + gap
+  }
+  function handleTrackScroll() {
+    if (scrollRAF.current) return
+    scrollRAF.current = requestAnimationFrame(() => {
+      scrollRAF.current = null
+      const el = trackRef.current
+      if (!el) return
+      const idx = Math.round(el.scrollLeft / slideStep(el))
+      setActiveSlide((prev) => (prev !== idx ? idx : prev))
+    })
+  }
+  function goToSlide(i) {
+    const el = trackRef.current
+    if (!el) return
+    el.scrollTo({ left: i * slideStep(el), behavior: 'smooth' })
+    setActiveSlide(i)
+  }
 
   // Auto-navigate to newly added overflow category
   // Compute overflow length here (before the early return) to avoid TDZ in the dependency array
@@ -186,6 +215,15 @@ export default function Calculator() {
   const hasRows      = course.categories.length >= 3
   const gridRows     = hasRows ? '1fr 1fr' : '1fr'
   const heroRowSpan  = hasRows ? '1 / 3' : '1 / 2'
+
+  // ── Mobile carousel slides: categories → letter scale → add (add hidden in demo) ──
+  const mobileSlides = [
+    ...course.categories.map((cat) => ({ kind: 'cat', cat })),
+    { kind: 'scale' },
+    ...(isDemo ? [] : [{ kind: 'add' }]),
+  ]
+  const clampedActive   = Math.min(activeSlide, mobileSlides.length - 1)
+  const isPreviewingAny = Object.keys(previewGrades).length > 0
 
   // ── Demo mutations (local state only, never persisted to Zustand) ────────────
   function demoSetItemGrade(_cid, catId, itemId, grade) {
@@ -320,10 +358,10 @@ export default function Calculator() {
   )
 
   return (
-    // Root: scrollable on mobile, fixed viewport on desktop
+    // Root: fixed single-viewport on both mobile and desktop (no page scroll)
     <div
-      className="flex flex-col overflow-y-auto md:overflow-hidden md:h-dvh"
-      style={{ minHeight: '100dvh', background: C.bg, fontFamily: FONT_SANS }}
+      className="flex flex-col h-dvh overflow-hidden"
+      style={{ background: C.bg, fontFamily: FONT_SANS }}
     >
 
       {/* ── Header (shared) ─────────────────────────────────────────────────── */}
@@ -335,59 +373,121 @@ export default function Calculator() {
 
       {/* ════════════════════════════════════════════════════════════════════════
           MOBILE LAYOUT  (hidden on md+)
-          Full-width cards, one per row, dvh-based heights, scrollable.
-          Each card fills ~75–80% of the viewport so the next card peeks
-          below, signalling scrollability to the user.
+          Two rows that fit one viewport — no page scroll:
+            Row 1  pinned hero (projected grade, always visible)
+            Row 2  horizontal swipe carousel of category / scale / add cards
+                   with peeking neighbours and accent-tinted page dots.
       ════════════════════════════════════════════════════════════════════════ */}
-      <div className="flex flex-col gap-4 md:hidden" style={{ padding: '0 20px 60px' }}>
+      <div className="flex flex-col flex-1 min-h-0 md:hidden">
 
-        {/* Grade hero — 60dvh, shorter than category cards as the entry point */}
-        <div style={{ height: '60dvh' }}>
+        {/* ── Row 1: pinned hero ─────────────────────────────────────────────── */}
+        <div style={{ flexShrink: 0, height: '38dvh', margin: '0 20px', position: 'relative' }}>
           <GradeHero letter={letter} grade={rounded} />
+          <AnimatePresence>
+            {isPreviewingAny && (
+              <motion.div
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                style={{ position: 'absolute', top: 18, right: 20, zIndex: 11, color: C.blue, fontFamily: FONT_SANS, fontWeight: 900, fontSize: 9, letterSpacing: '0.14em' }}
+              >
+                WHAT-IF PREVIEW
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Category cards — 75dvh each, mobile hero variant */}
-        {course.categories.map((cat) => (
-          <div key={cat.id} style={{ height: '75dvh' }}>
-            <CategoryCard
-              mobile
-              category={cat}
-              {...actions}
-              onClick={() => openModal(cat.id)}
-              previewValue={previewGrades[cat.id]}
-              onPreviewChange={(val) => handlePreviewChange(cat.id, val)}
-              onPreviewEnd={() => handlePreviewEnd(cat.id)}
-            />
-          </div>
-        ))}
-
-        {/* Add Category — fixed height action button, not a data card */}
-        {!isDemo && (
-          <motion.button
-            onClick={() => navigate(`/course/${courseId}/setup?addCategory=1`)}
-            whileHover={{ borderColor: 'rgba(255,255,255,0.22)', backgroundColor: 'rgba(255,255,255,0.03)' }}
-            transition={{ duration: 0.15 }}
+        {/* ── Row 2: carousel + page dots ────────────────────────────────────── */}
+        <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column', paddingTop: 14 }}>
+          <div
+            ref={trackRef}
+            onScroll={handleTrackScroll}
+            className="gc-carousel"
             style={{
-              height: 100,
-              width: '100%',
-              background: 'transparent',
-              border: `1px dashed ${C.border}`,
-              borderRadius: 14,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 4,
-              cursor: 'pointer',
+              flex: '1 1 auto', minHeight: 0,
+              display: 'flex', gap: 12,
+              padding: '0 28px',
+              overflowX: 'auto', overflowY: 'hidden',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
-            <span style={{ color: C.dim, fontSize: 20, lineHeight: 1, fontWeight: 300 }}>+</span>
-            <span style={{ color: C.dim, fontFamily: FONT_SANS, fontWeight: 700, fontSize: 9, letterSpacing: '0.12em' }}>ADD CATEGORY</span>
-          </motion.button>
-        )}
+            {mobileSlides.map((slide, i) => {
+              const active = i === clampedActive
+              return (
+                <div
+                  key={slide.kind === 'cat' ? slide.cat.id : slide.kind}
+                  style={{
+                    flex: '0 0 min(320px, 84vw)',
+                    height: '100%',
+                    scrollSnapAlign: 'center',
+                    scrollSnapStop: 'always',  // a swipe moves by only one card at a time
+                    opacity: active ? 1 : 0.5,
+                    transform: `scale(${active ? 1 : 0.965})`,
+                    transition: 'opacity 0.25s ease, transform 0.25s ease',
+                  }}
+                >
+                  {slide.kind === 'cat' && (
+                    <CategoryCard
+                      mobile
+                      category={slide.cat}
+                      {...actions}
+                      onClick={() => openModal(slide.cat.id)}
+                      previewValue={previewGrades[slide.cat.id]}
+                      onPreviewChange={(val) => handlePreviewChange(slide.cat.id, val)}
+                      onPreviewEnd={() => handlePreviewEnd(slide.cat.id)}
+                    />
+                  )}
+                  {slide.kind === 'scale' && (
+                    <LetterScale center scale={course.scale} currentGrade={rounded} categories={course.categories} />
+                  )}
+                  {slide.kind === 'add' && (
+                    <motion.button
+                      onClick={() => navigate(`/course/${courseId}/setup?addCategory=1`)}
+                      whileTap={{ scale: 0.985 }}
+                      transition={{ duration: 0.1 }}
+                      style={{
+                        height: '100%', width: '100%',
+                        background: 'transparent',
+                        border: `1px dashed ${C.border}`,
+                        borderRadius: 14,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center', gap: 16,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ width: 54, height: 54, borderRadius: '50%', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 300, color: C.dim, lineHeight: 1 }}>+</span>
+                      <span style={{ color: C.dim, fontFamily: FONT_SANS, fontWeight: 900, fontSize: 10, letterSpacing: '0.16em' }}>ADD CATEGORY</span>
+                    </motion.button>
+                  )}
+                </div>
+              )
+            })}
+          </div>
 
-        {/* Letter scale — auto height, terminal card, no peek needed */}
-        <LetterScale scale={course.scale} currentGrade={rounded} categories={course.categories} compact />
+          {/* Page dots */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 30, flexShrink: 0 }}>
+            {mobileSlides.map((_slide, i) => {
+              const active = i === clampedActive
+              return (
+                <button
+                  key={i}
+                  onClick={() => goToSlide(i)}
+                  aria-label={`Go to card ${i + 1} of ${mobileSlides.length}`}
+                  style={{
+                    width: active ? 9 : 7,
+                    height: active ? 9 : 7,
+                    borderRadius: '50%',
+                    background: active ? C.muted : 'rgba(255,255,255,0.22)',
+                    border: 'none', padding: 0, cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                  }}
+                />
+              )
+            })}
+          </div>
+        </div>
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════════

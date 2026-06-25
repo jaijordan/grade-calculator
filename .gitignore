@@ -23,6 +23,8 @@ dist-ssr
 
 # Project docs (internal planning)
 docs/
+DESIGN.md
+MOBILE_REDESIGN.md
 
 # Editor directories and files
 .vscode/*

@@ -60,6 +60,18 @@ input[type="range"] {
   outline: none;
   cursor: pointer;
   background: transparent;
+  /* Horizontal drags adjust the slider rather than swiping the mobile carousel */
+  touch-action: pan-y;
+}
+
+/* Mobile carousel track — hide scrollbar (swipe + dots are the affordance) */
+.gc-carousel {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.gc-carousel::-webkit-scrollbar {
+  display: none;
+  height: 0;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {

@@ -127,7 +127,7 @@ export default function CategoryCard({
           </div>
 
           {/* Centre: grade number */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 4 }}>
             <span style={{ color: displayColor, fontFamily: FONT_MONO, fontWeight: 900, fontSize: 'clamp(72px, 20vw, 96px)', lineHeight: 1, letterSpacing: '-0.02em', marginLeft: '-0.03em' }}>
               {displayNum}
             </span>

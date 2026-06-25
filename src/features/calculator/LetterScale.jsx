@@ -5,7 +5,9 @@ import { getLetter, gradeColor, colorHex, requiredScore } from '../../utils/grad
 import { C, CARD_BG, FONT_SANS, FONT_MONO } from './tokens'
 
 // ─── Letter Scale ─────────────────────────────────────────────────────────────
-export default function LetterScale({ scale, currentGrade, categories = [], compact = false }) {
+// center=true → fills card height but keeps the grade rows as a centered block
+//               (used in the mobile carousel so the card never looks stretched)
+export default function LetterScale({ scale, currentGrade, categories = [], compact = false, center = false }) {
   const { spotX, spotY, handleMouseMove, handleMouseLeave } = useCardSpotlight()
 
   const [view, setView] = useState('scale') // 'scale' | 'required'
@@ -77,7 +79,7 @@ export default function LetterScale({ scale, currentGrade, categories = [], comp
         {view === 'scale' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 20, rowGap: 0, flex: compact ? undefined : 1, overflow: compact ? undefined : 'hidden' }}>
             {[left, right].map((col, ci) => (
-              <div key={ci} style={{ display: 'flex', flexDirection: 'column', justifyContent: compact ? 'flex-start' : 'space-between', gap: compact ? 4 : 0 }}>
+              <div key={ci} style={{ display: 'flex', flexDirection: 'column', justifyContent: compact ? 'flex-start' : center ? 'center' : 'space-between', gap: compact ? 4 : center ? 10 : 0 }}>
                 {col.map((entry) => {
                   const active = entry.grade === currentLetter
                   const entryColor = entry.grade === 'F' ? '#FF595E' : gradeColor(entry.min + 0.5)
